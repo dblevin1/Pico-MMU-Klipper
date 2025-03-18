@@ -1,5 +1,8 @@
-This repo uses Github Actions to keep this "fork" up-to-date with the [Stinger Pico MMU Klipper](https://github.com/lhndo/LH-Stinger/tree/main/User_Mods/MMU/Stinger%20Pico%20MMU%20-%20%40LH/Klipper) config files.
 
+## Features:
+* This repo is small, the LH-Stinger repo is more thn 2.5GB
+* You can fork this repo and enable github actions if your security conscious
+* This repo uses Github Actions to keep this "fork" up-to-date with the [Stinger Pico MMU Klipper](https://github.com/lhndo/LH-Stinger/tree/main/User_Mods/MMU/Stinger%20Pico%20MMU%20-%20%40LH/Klipper) config files.
 
 ## Installation:
 
