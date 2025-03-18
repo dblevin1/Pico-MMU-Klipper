@@ -55,9 +55,9 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-# git checkout upstream-mmu-klipper
-# git fetch origin
-# git push -u origin upstream-mmu-klipper
+git checkout upstream-mmu-klipper
+new_code_commit=$(git log -n 1 --pretty=format:%H -- sp_mmu_code.cfg)
+new_config_commit=$(git log -n 1 --pretty=format:%H -- sp_mmu.cfg)
 
 git checkout $current_branch
 if [ "$has_stashed" = true ]; then
@@ -66,40 +66,20 @@ if [ "$has_stashed" = true ]; then
     git stash pop
 fi
 
-git fetch origin
-git pull
-echo "updating '$current_branch' branch from upstream-mmu-klipper"
-# git rebase upstream-mmu-klipper
-git merge upstream-mmu-klipper --no-edit --allow-unrelated-histories
-if [ $? -ne 0 ]; then
-    echo -e "${RED}Merge failed, please resolve conflicts manually.${NC}"
-    exit 1
+if [ "$original_code_commit" != "$new_code_commit" ] || [ "$original_config_commit" != "$new_config_commit" ]; then
+    git fetch origin
+    git pull
+    echo "updating '$current_branch' branch from upstream-mmu-klipper"
+    git merge upstream-mmu-klipper --no-edit --allow-unrelated-histories
+    if [ $? -ne 0 ]; then
+        echo -e "${RED}Merge failed, please resolve conflicts manually.${NC}"
+        exit 1
+    fi
+
+    git push
 fi
 
-# git status
-# echo "----git log----"
-# #git diff
-# git log HEAD..origin/main
-# echo "----git log end----"
-# git pull --rebase
-# git status
-git push
-
-# new_code_commit=$(git log -n 1 --pretty=format:%H -- sp_mmu_code.cfg)
-# new_config_commit=$(git log -n 1 --pretty=format:%H -- sp_mmu.cfg)
 # config_version=$(grep "VERSION: " sp_mmu_code.cfg | sed "s/.*: //")
-# if [ "$original_code_commit" != "$new_code_commit" ] || [ "$original_config_commit" != "$new_config_commit" ]; then
-#     # need version bump
-# fi
-# if [ "$original_code_commit" != "$new_code_commit" ]; then
-#     echo "sp_mmu_code.cfg has changed"
-# else
-#     echo "sp_mmu_code.cfg has not changed"
-# fi
-# if [ "$original_config_commit" != "$new_config_commit" ]; then
-#     echo "sp_mmu.cfg has changed"
-# else
-#     echo "sp_mmu.cfg has not changed"
-# fi
+
 
 
