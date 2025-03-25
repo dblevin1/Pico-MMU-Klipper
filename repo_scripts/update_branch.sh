@@ -30,7 +30,7 @@ fi
 #echo "On branch $current_branch"
 current_branch="main"
 git checkout main
-git fetch origin
+git fetch -a
 git pull
 
 original_code_commit=$(git log -n 1 --pretty=format:%H -- sp_mmu_code.cfg)
@@ -59,6 +59,24 @@ git checkout upstream-mmu-klipper
 new_code_commit=$(git log -n 1 --pretty=format:%H -- sp_mmu_code.cfg)
 new_config_commit=$(git log -n 1 --pretty=format:%H -- sp_mmu.cfg)
 
+has_change=false
+if [ "$original_code_commit" != "$new_code_commit" ]; then
+    echo "Code commit hash has changed, updating..."
+    echo "Original code commit: $original_code_commit"
+    echo "New code commit: $new_code_commit"
+    has_change=true
+fi
+if [ "$original_config_commit" != "$new_config_commit" ]; then
+    echo "Config commit hash has changed, updating..."
+    echo "Original config commit: $original_config_commit"
+    echo "New config commit: $new_config_commit"
+    has_change=true
+fi
+if [ "$has_change" = false ]; then
+    echo "No changes detected, exiting..."
+    exit 0
+fi
+
 git checkout $current_branch
 if [ "$has_stashed" = true ]; then
     echo "Popping stash..."
@@ -66,18 +84,16 @@ if [ "$has_stashed" = true ]; then
     git stash pop
 fi
 
-if [ "$original_code_commit" != "$new_code_commit" ] || [ "$original_config_commit" != "$new_config_commit" ]; then
-    git fetch origin
-    git pull
-    echo "updating '$current_branch' branch from upstream-mmu-klipper"
-    git merge upstream-mmu-klipper --no-edit --allow-unrelated-histories
-    if [ $? -ne 0 ]; then
-        echo -e "${RED}Merge failed, please resolve conflicts manually.${NC}"
-        exit 1
-    fi
-
-    git push
+git fetch -a
+git pull
+echo "updating '$current_branch' branch from upstream-mmu-klipper"
+git merge upstream-mmu-klipper --no-edit --allow-unrelated-histories
+if [ $? -ne 0 ]; then
+    echo -e "${RED}Merge failed, please resolve conflicts manually.${NC}"
+    exit 1
 fi
+
+git push
 
 # config_version=$(grep "VERSION: " sp_mmu_code.cfg | sed "s/.*: //")
 
